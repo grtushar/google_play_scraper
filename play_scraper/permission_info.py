@@ -7,6 +7,7 @@ import time
 CHROME_DRIVER_PATH = '/Users/grtushar/Documents/libs/chromedriver'
 TIME_TO_LOAD_DATE_IN_SECOND = 5
 TIME_TO_LOAD_MODAL_DATA_IN_SECOND = 5
+MAX_ATTEMPT = 100
 
 options = Options()
 options.headless = True
@@ -16,6 +17,7 @@ driver = webdriver.Chrome(CHROME_DRIVER_PATH, options=options)
 def get_permission_info(url):
     ret = ""
 
+    attempt = 1
     while True:
         driver.get(url)
         time.sleep(TIME_TO_LOAD_DATE_IN_SECOND)
@@ -44,7 +46,8 @@ def get_permission_info(url):
             for sublistContent in permission_contents[i]:
                 ret += sublistContent + "\n"
                 # print("-" + sublistContent)
-        if len(permission_list) > 0 and len(permission_sub_lists):
+        if (len(permission_list) > 0 and len(permission_sub_lists)) or attempt > MAX_ATTEMPT:
             break
 
+        attempt += 1
     return ret
