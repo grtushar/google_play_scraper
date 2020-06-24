@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from unidecode import unidecode
 import time
 
-from permission_info import get_permission_info
+from play_scraper.permission_info import get_permission_info
 
 chrome_driver_path = '/Users/grtushar/Documents/libs/chromedriver'
 options = Options()
@@ -23,7 +23,6 @@ try:
 except NameError:
     basestring = str
 
-import requests
 from bs4 import BeautifulSoup
 
 from play_scraper import settings as s

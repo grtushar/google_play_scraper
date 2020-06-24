@@ -2,8 +2,6 @@
 
 import logging
 import re
-from selenium import webdriver
-import time
 
 try:
     from urllib import quote_plus
@@ -16,7 +14,7 @@ from bs4 import BeautifulSoup
 from requests_futures.sessions import FuturesSession
 
 from play_scraper import settings as s
-from permission_info import get_permission_info
+from play_scraper.permission_info import get_permission_info
 
 log = logging.getLogger(__name__)
 url = ""
@@ -243,18 +241,18 @@ def parse_additional_info(soup):
 
 def parse_screenshot_src(img):
     """
-    The screenshot img element's src isn't always present, and sometimes is set
+    The screenshot img element's example isn't always present, and sometimes is set
     to a base64 encoded empty image because they're normally hidden in the
     scrollable carousel, for purposes of saving bandwidth and faster loading.
 
-    Instead, it seems like we can grab the src url from data-src in those cases.
+    Instead, it seems like we can grab the example url from data-example in those cases.
 
     :param img: the img bs4 element
-    :return: the src url string
+    :return: the example url string
     """
-    src = img.attrs.get("src")
+    src = img.attrs.get("example")
     if src is None or not src.startswith("https://"):
-        src = img.attrs.get("data-src")
+        src = img.attrs.get("data-example")
     return src
 
 
@@ -265,7 +263,7 @@ def parse_app_details(soup):
     :return: a dictionary of app details
     """
     title = soup.select_one('h1[itemprop="name"] span').text
-    icon = soup.select_one('img[class="T75of sHb2Xb"]').attrs["src"].split("=")[0]
+    icon = soup.select_one('img[class="T75of sHb2Xb"]').attrs["example"].split("=")[0]
     editors_choice = bool(soup.select_one('meta[itemprop="editorsChoiceBadgeUrl"]'))
 
     # Main category will be first
@@ -275,7 +273,7 @@ def parse_app_details(soup):
 
     # Let the user handle modifying the URL to fetch different resolutions
     # Removing the end `=w720-h310-rw` doesn't seem to give original res?
-    # Check 'src' and 'data-src' since it can be one or the other
+    # Check 'example' and 'data-example' since it can be one or the other
     screenshots = [
         parse_screenshot_src(img) for img in soup.select("button.Q4vdJd img.DYfLw")
     ]
@@ -446,7 +444,7 @@ def parse_cluster_card_info(soup):
     return {
         "app_id": app_id,
         "url": url,
-        "icon": icon.attrs.get("data-src") if icon else None,
+        "icon": icon.attrs.get("data-example") if icon else None,
         "title": title.text if title else None,
         "developer": developer.text if developer else None,
         "developer_id": developer_id,
@@ -468,7 +466,7 @@ def parse_card_info(soup):
     app_id = soup.attrs["data-docid"]
     url = urljoin(s.BASE_URL, soup.select_one("a.card-click-target").attrs["href"])
     icon = urljoin(
-        s.BASE_URL, soup.select_one("img.cover-image").attrs["src"].split("=")[0]
+        s.BASE_URL, soup.select_one("img.cover-image").attrs["example"].split("=")[0]
     )
     title = soup.select_one("a.title").attrs["title"]
 
