@@ -4,10 +4,13 @@ from bs4 import BeautifulSoup
 from unidecode import unidecode
 import time
 
-chrome_driver_path = '/Users/grtushar/Documents/libs/chromedriver'
+CHROME_DRIVER_PATH = '/Users/grtushar/Documents/libs/chromedriver'
+TIME_TO_LOAD_DATE_IN_SECOND = 5
+TIME_TO_LOAD_MODAL_DATA_IN_SECOND = 5
+
 options = Options()
 options.headless = True
-driver = webdriver.Chrome(chrome_driver_path, options=options)
+driver = webdriver.Chrome(CHROME_DRIVER_PATH, options=options)
 
 
 def get_permission_info(url):
@@ -15,13 +18,13 @@ def get_permission_info(url):
 
     while True:
         driver.get(url)
-        time.sleep(5)
+        time.sleep(TIME_TO_LOAD_DATE_IN_SECOND)
         source = driver.page_source
         soup1 = BeautifulSoup(source, "lxml")
         view_details_link = soup1.find('a', {'class': 'hrTbp', 'jsname': 'Hly47e'})
         view_details_link = unidecode(view_details_link.text)
         driver.find_element_by_link_text(view_details_link).click()
-        time.sleep(5)
+        time.sleep(TIME_TO_LOAD_MODAL_DATA_IN_SECOND)
         source2 = driver.page_source
         soup2 = BeautifulSoup(source2, "lxml")
 
