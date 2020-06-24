@@ -1,17 +1,8 @@
 # -*- coding: utf-8 -*-
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from unidecode import unidecode
-import time
+import requests
+import logging
 
 from play_scraper.permission_info import get_permission_info
-
-chrome_driver_path = '/Users/grtushar/Documents/libs/chromedriver'
-options = Options()
-options.headless = True
-driver = webdriver.Chrome(chrome_driver_path, options=options)
-
-import logging
 
 try:
     from urllib import quote_plus
@@ -93,28 +84,17 @@ class PlayScraper(object):
         """
         url = build_url("details", app_id)
 
-        driver.get(url)
-        time.sleep(5)
-        source = driver.page_source
-        soup1 = BeautifulSoup(source, "lxml")
-        view_details_link = soup1.find('a', {'class': 'hrTbp', 'jsname': 'Hly47e'})
-        view_details_link = unidecode(view_details_link.text)
-        driver.find_element_by_link_text(view_details_link).click()
-        time.sleep(5)
-        source2 = driver.page_source
-        soup2 = BeautifulSoup(source2, "lxml")
-        get_permission_info(soup2)
+        try:
+            response = send_request("GET", url, params=self.params)
+            soup = BeautifulSoup(response.content, "lxml", from_encoding="utf8")
+        except requests.exceptions.HTTPError as e:
+            raise ValueError(
+                "Invalid application ID: {app}. {error}".format(app=app_id, error=e)
+            )
 
-        # try:
-        #     response = send_request("GET", url, params=self.params)
-        #     soup = BeautifulSoup(response.content, "lxml", from_encoding="utf8")
-        # except requests.exceptions.HTTPError as e:
-        #     raise ValueError(
-        #         "Invalid application ID: {app}. {error}".format(app=app_id, error=e)
-        #     )
-
-        app_json = parse_app_details(soup2)
+        app_json = parse_app_details(soup)
         app_json.update({"app_id": app_id, "url": url})
+        app_json.update({"permissions": get_permission_info(url)})
         return app_json
 
     def collection(

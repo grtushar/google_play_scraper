@@ -14,10 +14,9 @@ from bs4 import BeautifulSoup
 from requests_futures.sessions import FuturesSession
 
 from play_scraper import settings as s
-from play_scraper.permission_info import get_permission_info
 
 log = logging.getLogger(__name__)
-url = ""
+
 
 def default_headers():
     return {
@@ -133,8 +132,6 @@ def send_request(
 
 
 def parse_additional_info(soup):
-    unchaned_soup = soup
-    soup = soup.select_one(".IxB2fe")
     """Parses an app's additional information section on its detail page.
 
     :param soup: the additional_info section BeautifulSoup object
@@ -176,9 +173,6 @@ def parse_additional_info(soup):
         "developer_address": None,
         "privacy_policy": None
     }
-
-    # driver = webdriver.Chrome('/Users/grtushar/Documents/libs/chromedriver')
-    # driver.get('https://play.google.com/store/apps/details?id=com.twentythreeandme.app&hl=en_US')
 
     for title_div in section_titles_divs:
         section_title = title_div.string
@@ -228,10 +222,8 @@ def parse_additional_info(soup):
                 }
                 data.update(dev_data)
             elif title_key == "permissions":
-                value = get_permission_info(unchaned_soup)
-                # for link in value_div.findAll('a'):
-                #     # driver.find_element_by_link_text(link).click()
-                #     print(link)
+                for link in value_div.findAll('a'):
+                    print(link)
             else:
                 value = value_div.text
 
@@ -241,18 +233,18 @@ def parse_additional_info(soup):
 
 def parse_screenshot_src(img):
     """
-    The screenshot img element's example isn't always present, and sometimes is set
+    The screenshot img element's src isn't always present, and sometimes is set
     to a base64 encoded empty image because they're normally hidden in the
     scrollable carousel, for purposes of saving bandwidth and faster loading.
 
-    Instead, it seems like we can grab the example url from data-example in those cases.
+    Instead, it seems like we can grab the src url from data-src in those cases.
 
     :param img: the img bs4 element
-    :return: the example url string
+    :return: the src url string
     """
-    src = img.attrs.get("example")
+    src = img.attrs.get("src")
     if src is None or not src.startswith("https://"):
-        src = img.attrs.get("data-example")
+        src = img.attrs.get("data-src")
     return src
 
 
@@ -263,7 +255,7 @@ def parse_app_details(soup):
     :return: a dictionary of app details
     """
     title = soup.select_one('h1[itemprop="name"] span').text
-    icon = soup.select_one('img[class="T75of sHb2Xb"]').attrs["example"].split("=")[0]
+    icon = soup.select_one('img[class="T75of sHb2Xb"]').attrs["src"].split("=")[0]
     editors_choice = bool(soup.select_one('meta[itemprop="editorsChoiceBadgeUrl"]'))
 
     # Main category will be first
@@ -273,7 +265,7 @@ def parse_app_details(soup):
 
     # Let the user handle modifying the URL to fetch different resolutions
     # Removing the end `=w720-h310-rw` doesn't seem to give original res?
-    # Check 'example' and 'data-example' since it can be one or the other
+    # Check 'src' and 'data-src' since it can be one or the other
     screenshots = [
         parse_screenshot_src(img) for img in soup.select("button.Q4vdJd img.DYfLw")
     ]
@@ -337,7 +329,7 @@ def parse_app_details(soup):
 
     free = price == "0"
 
-    additional_info_data = parse_additional_info(soup)
+    additional_info_data = parse_additional_info(soup.select_one(".IxB2fe"))
 
     offers_iap = bool(additional_info_data.get("iap_range"))
 
@@ -444,7 +436,7 @@ def parse_cluster_card_info(soup):
     return {
         "app_id": app_id,
         "url": url,
-        "icon": icon.attrs.get("data-example") if icon else None,
+        "icon": icon.attrs.get("data-src") if icon else None,
         "title": title.text if title else None,
         "developer": developer.text if developer else None,
         "developer_id": developer_id,
@@ -466,7 +458,7 @@ def parse_card_info(soup):
     app_id = soup.attrs["data-docid"]
     url = urljoin(s.BASE_URL, soup.select_one("a.card-click-target").attrs["href"])
     icon = urljoin(
-        s.BASE_URL, soup.select_one("img.cover-image").attrs["example"].split("=")[0]
+        s.BASE_URL, soup.select_one("img.cover-image").attrs["src"].split("=")[0]
     )
     title = soup.select_one("a.title").attrs["title"]
 

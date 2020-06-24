@@ -10,8 +10,19 @@ options.headless = True
 driver = webdriver.Chrome(chrome_driver_path, options=options)
 
 
-def get_permission_info(soup2):
+def get_permission_info(url):
     ret = ""
+
+    driver.get(url)
+    time.sleep(5)
+    source = driver.page_source
+    soup1 = BeautifulSoup(source, "lxml")
+    view_details_link = soup1.find('a', {'class': 'hrTbp', 'jsname': 'Hly47e'})
+    view_details_link = unidecode(view_details_link.text)
+    driver.find_element_by_link_text(view_details_link).click()
+    time.sleep(5)
+    source2 = driver.page_source
+    soup2 = BeautifulSoup(source2, "lxml")
 
     permission_sub_lists = soup2.find_all('ul', {'class': 'GLaCt'})
     permission_contents = []

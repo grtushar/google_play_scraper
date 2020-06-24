@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-google_play_scraper.api
+play_scraper.api
 
 :copyright: (c) 2016 Daniel Liu.
 :license: MIT, see LICENSE for more details.
