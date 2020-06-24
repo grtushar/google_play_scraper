@@ -37,10 +37,10 @@ def get_permission_info(url):
         for i in range(0, len(permission_list)):
             permission = permission_list[i]
             ret += permission.text + "\n"
-            print(permission.text)
+            # print(permission.text)
             for sublistContent in permission_contents[i]:
                 ret += sublistContent + "\n"
-                print("-" + sublistContent)
+                # print("-" + sublistContent)
         if len(permission_list) > 0 and len(permission_sub_lists):
             break
 
