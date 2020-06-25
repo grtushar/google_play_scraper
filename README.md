@@ -7,7 +7,10 @@ This updated version of google [play scraper](https://github.com/danieliu/play-s
 
 ### Usage
 
-Configure the variables in the [permission_info.py](https://github.com/grtushar/google_play_scraper/blob/master/play_scraper/permission_info.py) in order to run this.
+To get an idea about the api documentations please follow [this link](https://github.com/danieliu/play-scraper).
+
+And to configure the program to get permission information you need update the variables in the [permission_info.py](https://github.com/grtushar/google_play_scraper/blob/master/play_scraper/permission_info.py).
+
 [Download](https://chromedriver.chromium.org/downloads) the chrome-driver and then set the *CHROME_DRIVER_PATH* variable of permission_info.py file with the path of the chrome-driver.
 
 Sometimes the information doesn't load, so there is a retry mechanism. You can limit the max retry by setting *MAX_ATTEMPT* variable to your desired retry count.
