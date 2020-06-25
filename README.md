@@ -5,7 +5,8 @@ The permission information of an app in the google play store resides inside a m
 
 This updated version of google [play scraper](https://github.com/danieliu/play-scraper) perform the click event on the "view details" under permission category using [selenium](https://pypi.org/project/selenium/) and [chrome-driver](https://chromedriver.chromium.org/)
 
-###Usage
+### Usage
+
 Configure the variables in the [permission_info.py](https://github.com/grtushar/google_play_scraper/blob/master/play_scraper/permission_info.py) in order to run this.
 [Download](https://chromedriver.chromium.org/downloads) the chrome-driver and then set the *CHROME_DRIVER_PATH* variable of permission_info.py file with the path of the chrome-driver.
 
